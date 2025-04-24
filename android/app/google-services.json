@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "606043371704",
+    "firebase_url": "https://e-commerce-app-d5951-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "e-commerce-app-d5951",
+    "storage_bucket": "e-commerce-app-d5951.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606043371704:android:1d06d6b82582ca0e829c4d",
+        "android_client_info": {
+          "package_name": "com.example.complete_shop_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606043371704-pt4crq6t28s1ac77eg1crg6tt450evf0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwOdg6WlRjt93nWTLFzDG-f3wdZspzNPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606043371704-pt4crq6t28s1ac77eg1crg6tt450evf0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "606043371704-gffktu4ge7ovfvfsnfng29jthlon88k9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.completeShopClone"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606043371704:android:4955252b5807934d829c4d",
+        "android_client_info": {
+          "package_name": "com.example.ecommerce"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606043371704-pt4crq6t28s1ac77eg1crg6tt450evf0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwOdg6WlRjt93nWTLFzDG-f3wdZspzNPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606043371704-pt4crq6t28s1ac77eg1crg6tt450evf0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "606043371704-gffktu4ge7ovfvfsnfng29jthlon88k9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.completeShopClone"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

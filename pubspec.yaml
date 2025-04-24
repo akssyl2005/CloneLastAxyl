@@ -1,0 +1,45 @@
+name: complete_shop_clone
+description: A new Flutter project
+
+publish_to: 'none' # Remove this line if you want to publish to the store
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.7
+  provider: ^6.1.2
+  carousel_slider: ^5.0.0 # ou la dernière version stable disponible
+  cupertino_icons: ^1.0.8
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.16.0
+  google_sign_in: ^6.2.1
+  cloud_firestore: ^4.17.5
+    
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/banner1.jfif
+    - assets/images/banner2.jfif
+    - assets/images/banner3.jfif
+    - assets/images/banner4.jfif
+    
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
