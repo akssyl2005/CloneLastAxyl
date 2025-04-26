@@ -1,3 +1,4 @@
+import 'package:complete_shop_clone/screens/auth/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,7 +6,9 @@ import 'screens/home/home_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/sign_in_screen.dart';
 import 'screens/auth/forget_password_screen.dart';
+import 'screens/auth/splash.dart'; // ✅ Correction : import de splash.dart
 import 'firebase_options.dart';
+import '';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,37 +41,12 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.black,
         ),
       ),
-      home: const AuthWrapper(),
+      home: const SplashScreen(), // ✅ SplashScreen en première page
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login': (context) => const SignInScreen(),
         '/home': (context) => const HomeScreen(),
         '/forget-password': (context) => const ForgetPasswordScreen(),
-      },
-    );
-  }
-}
-
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasData) {
-          return const HomeScreen();
-        }
-
-        return const SignInScreen();
       },
     );
   }

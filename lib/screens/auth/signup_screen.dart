@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -16,6 +16,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool isLoading = false;
   bool acceptTerms = false;
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible = false;
+
+  // Liste des domaines autorisés
+  final List<String> allowedDomains = [
+    'gmail.com',
+    'yahoo.com',
+    'outlook.com',
+    'icloud.com',
+    'protonmail.com',
+    'zoho.com',
+    'aol.com',
+    'yandex.com',
+    'mail.com',
+    'gmx.com',
+    'fastmail.com',
+    'tutanota.com',
+    'mail.ru',
+    'orange.fr',
+    'sfr.fr',
+    'free.fr',
+    'walla.com',
+    'o2online.de',
+    'twitch.com',
+    'discord.com',
+  ];
 
   void showToast(String message, {bool success = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -26,14 +52,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  // Validation de l'email
+  bool isValidEmail(String email) {
+    final domain = email.split('@').last;
+    return allowedDomains.contains(domain);
+  }
+
   Future<void> signUp() async {
     final name = fullNameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       showToast("All fields are required.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showToast(
+        "Please use a valid email address (e.g., gmail.com, yahoo.com).",
+      );
       return;
     }
 
@@ -77,20 +119,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Image.asset('assets/images/logo.jpeg', height: 100)),
+              Center(
+                child: Image.asset('assets/images/logo.jpeg', height: 100),
+              ),
               const SizedBox(height: 30),
               const Text(
                 "Create your account",
-                style: TextStyle(color: Colors.black87, fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 24),
               _buildInputField("Full Name", fullNameController),
               const SizedBox(height: 16),
               _buildInputField("Email", emailController),
               const SizedBox(height: 16),
-              _buildInputField("Password", passwordController, isPassword: true),
+              _buildPasswordField(
+                "Password",
+                passwordController,
+                _passwordVisible,
+              ),
               const SizedBox(height: 16),
-              _buildInputField("Confirm Password", confirmPasswordController, isPassword: true),
+              _buildPasswordField(
+                "Confirm Password",
+                confirmPasswordController,
+                _confirmPasswordVisible,
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -110,25 +166,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: signUp,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: signUp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text("Sign Up", style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      child: const Text(
+                        "Sign Up",
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
+                  ),
               const SizedBox(height: 24),
               Center(
                 child: GestureDetector(
                   onTap: () => Navigator.pushNamed(context, '/login'),
                   child: const Text(
                     "Already have an account? Sign In",
-                    style: TextStyle(color: Colors.black54, decoration: TextDecoration.underline),
+                    style: TextStyle(
+                      color: Colors.black54,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
@@ -139,10 +203,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, {bool isPassword = false}) {
+  // Fonction pour afficher un champ de texte avec un mot de passe
+  Widget _buildPasswordField(
+    String label,
+    TextEditingController controller,
+    bool isPasswordVisible,
+  ) {
     return TextField(
       controller: controller,
-      obscureText: isPassword,
+      obscureText: !isPasswordVisible,
+      style: const TextStyle(color: Colors.black87),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.black54),
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: Colors.black54,
+          ),
+          onPressed: () {
+            setState(() {
+              if (label == "Password") {
+                _passwordVisible = !_passwordVisible;
+              } else {
+                _confirmPasswordVisible = !_confirmPasswordVisible;
+              }
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  // Fonction pour afficher un champ de texte classique
+  Widget _buildInputField(String label, TextEditingController controller) {
+    return TextField(
+      controller: controller,
       style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: label,

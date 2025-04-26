@@ -4,10 +4,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:complete_shop_clone/servises/auth_service.dart';
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({Key? key}) : super(key: key);
+  const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState(); 
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
 class _SignInScreenState extends State<SignInScreen> {
@@ -74,7 +74,9 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Image.asset('assets/images/logo.jpeg', height: 100)),
+              Center(
+                child: Image.asset('assets/images/logo.jpeg', height: 100),
+              ),
               const SizedBox(height: 30),
               const Text(
                 "Welcome Back",
@@ -87,12 +89,17 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 24),
               _buildInputField("Email", emailController),
               const SizedBox(height: 16),
-              _buildInputField("Password", passwordController, isPassword: true),
+              _buildInputField(
+                "Password",
+                passwordController,
+                isPassword: true,
+              ),
               const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/forget-password'),
+                  onPressed:
+                      () => Navigator.pushNamed(context, '/forget-password'),
                   child: const Text(
                     "Forgot Password?",
                     style: TextStyle(color: Colors.black54),
@@ -103,43 +110,53 @@ class _SignInScreenState extends State<SignInScreen> {
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: signInWithEmail,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: const Text("Sign In", style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: signInWithGoogle,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.black87,
-                              side: const BorderSide(color: Colors.black),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset("assets/images/google.jfif", height: 24),
-                                const SizedBox(width: 10),
-                                const Text("Sign in with Google"),
-                              ],
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: signInWithEmail,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
+                          child: const Text(
+                            "Sign In",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: signInWithGoogle,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.black87,
+                            side: const BorderSide(color: Colors.black),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                "assets/images/google.jfif",
+                                height: 24,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text("Sign in with Google"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
               const SizedBox(height: 24),
               Center(
                 child: GestureDetector(
@@ -152,7 +169,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -160,7 +177,11 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Widget _buildInputField(String label, TextEditingController controller, {bool isPassword = false}) {
+  Widget _buildInputField(
+    String label,
+    TextEditingController controller, {
+    bool isPassword = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,

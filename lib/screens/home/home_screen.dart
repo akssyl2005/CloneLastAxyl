@@ -6,10 +6,7 @@ import 'package:complete_shop_clone/components/product_card.dart';
 import 'package:complete_shop_clone/components/promo_banner.dart';
 import 'package:complete_shop_clone/data/mock_products.dart';
 import 'package:complete_shop_clone/components/bottom_nav_bar.dart';
-import 'package:complete_shop_clone/components/category_card.dart';
-import 'package:complete_shop_clone/models/category.dart';
 import 'package:complete_shop_clone/data/mock_categories.dart';
-import 'package:complete_shop_clone/screens/product_details/product_details_screen.dart';
 import 'package:complete_shop_clone/models/product.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -34,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
-  List <Product > get filteredProducts {
+  List<Product> get filteredProducts {
     if (_selectedCategoryIndex == 0) return demoProducts;
     final categoryName = demoCategories[_selectedCategoryIndex].name;
     return demoProducts

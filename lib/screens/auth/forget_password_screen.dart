@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
-  const ForgetPasswordScreen({Key? key}) : super(key: key);
+  const ForgetPasswordScreen({super.key});
 
   @override
   State<ForgetPasswordScreen> createState() => _ForgetPasswordScreenState();
@@ -48,7 +48,9 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Enter your email and we'll send a link to reset your password."),
+            const Text(
+              "Enter your email and we'll send a link to reset your password.",
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: emailController,
@@ -61,12 +63,12 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: resetPassword,
-                      child: const Text("Send Reset Link"),
-                    ),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: resetPassword,
+                    child: const Text("Send Reset Link"),
                   ),
+                ),
           ],
         ),
       ),
