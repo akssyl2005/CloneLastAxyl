@@ -1,33 +1,58 @@
-import 'package:complete_shop_clone/screens/auth/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'screens/home/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Écrans
+import 'screens/auth/splash.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/sign_in_screen.dart';
 import 'screens/auth/forget_password_screen.dart';
-import 'screens/auth/splash.dart'; // ✅ Correction : import de splash.dart
+import 'screens/home/home_screen.dart';
+import 'package:complete_shop_clone/profile/profile_screen.dart';
+import 'package:complete_shop_clone/profile/profile_loader.dart';
+import 'package:complete_shop_clone/onboarding/onboarding.dart'; // Assurez-vous que ce fichier existe
+
+// Firebase options
 import 'firebase_options.dart';
-import '';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   try {
-    print("🟡 Firebase initializing...");
+    print("🟡 Initialisation de Firebase...");
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print("🟢 Firebase initialized.");
+    print("🟢 Firebase initialisé avec succès.");
   } catch (e, s) {
-    print("🔴 Firebase init error: $e");
+    print("🔴 Erreur lors de l'initialisation Firebase: $e");
     print("🔍 Stack: $s");
   }
 
-  runApp(const MyApp());
+  // Vérification des préférences pour l'onboarding et l'authentification
+  final prefs = await SharedPreferences.getInstance();
+  final bool seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  Widget initialScreen;
+  if (user != null) {
+    initialScreen = const Homepage();
+  } else {
+    if (!seenOnboarding) {
+      initialScreen = const OnBoardingScreen();
+    } else {
+      initialScreen = const SignInScreen();
+    }
+  }
+
+  runApp(MyApp(initialScreen: initialScreen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget initialScreen;
+
+  const MyApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
@@ -41,13 +66,19 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.black,
         ),
       ),
-      home: const SplashScreen(), // ✅ SplashScreen en première page
+      home: initialScreen,
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login': (context) => const SignInScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => const Homepage(),
         '/forget-password': (context) => const ForgetPasswordScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/profile-loader': (context) {
+          final uid = ModalRoute.of(context)!.settings.arguments as String;
+          return ProfileLoader(uid: uid);
+        },
       },
     );
   }
 }
+

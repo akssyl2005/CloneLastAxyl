@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../home/home_screen.dart';
-import '../auth/sign_in_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -32,11 +30,21 @@ class _SplashScreenState extends State<SplashScreen>
 
     _logoController.forward();
 
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const AuthWrapper()),
-      );
-    });
+    _navigateBasedOnAuth();
+  }
+
+  void _navigateBasedOnAuth() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (mounted) {
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    }
   }
 
   @override
@@ -53,39 +61,13 @@ class _SplashScreenState extends State<SplashScreen>
         child: ScaleTransition(
           scale: _logoAnimation,
           child: SvgPicture.asset(
-            'assets/images/logo.svg', // Le logo SVG ici
-            height: 400, // Logo encore plus grand
-            width: 400, // Logo encore plus grand
+            'assets/images/logo.svg',
+            height: 400,
+            width: 400,
             fit: BoxFit.contain,
           ),
         ),
       ),
-    );
-  }
-}
-
-// ✅ AuthWrapper inchangé
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasData) {
-          return const HomeScreen();
-        }
-
-        return const SignInScreen();
-      },
     );
   }
 }

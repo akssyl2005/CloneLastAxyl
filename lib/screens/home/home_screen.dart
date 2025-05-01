@@ -1,127 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:complete_shop_clone/components/search_bar.dart';
-import 'package:complete_shop_clone/components/category_card.dart';
-import 'package:complete_shop_clone/components/product_card.dart';
-import 'package:complete_shop_clone/components/promo_banner.dart';
-import 'package:complete_shop_clone/data/mock_products.dart';
-import 'package:complete_shop_clone/components/bottom_nav_bar.dart';
-import 'package:complete_shop_clone/data/mock_categories.dart';
-import 'package:complete_shop_clone/models/product.dart';
+import 'package:complete_shop_clone/widgets/top_bar.dart';
+import 'package:complete_shop_clone/widgets/home_body.dart';
+import 'package:complete_shop_clone/widgets/bottom_navbar.dart';
+import 'package:complete_shop_clone/widgets/search_bar_home.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class Homepage extends StatefulWidget {
+  const Homepage({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<Homepage> createState() => _HomepageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-  int _selectedCategoryIndex = 0;
+class _HomepageState extends State<Homepage> {
+  int _currentIndex = 0;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacementNamed(context, '/login');
-  }
-
-  List<Product> get filteredProducts {
-    if (_selectedCategoryIndex == 0) return demoProducts;
-    final categoryName = demoCategories[_selectedCategoryIndex].name;
-    return demoProducts
-        .where((product) => product.category == categoryName)
-        .toList();
-  }
+  final List<Widget> _screens = [
+    const HomeBody(),
+    const Center(child: Text("Filtres", style: TextStyle(fontSize: 18))),
+    const Center(child: Text("Panier", style: TextStyle(fontSize: 18))),
+    const Center(child: Text("Profil", style: TextStyle(fontSize: 18))),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        title: const Text('ReLook'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
-          ),
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          const SafeArea(child: TopBar()), // Profil en haut
+          const SearchBarHome(), // 👈 Barre de recherche
+          Expanded(child: _screens[_currentIndex]),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CustomSearchBar(),
-                  const SizedBox(height: 20),
-                  const PromoBanner(),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Catégories",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 100,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: demoCategories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
-                        final category = demoCategories[index];
-                        return CategoryCard(
-                          category: category,
-                          selected: index == _selectedCategoryIndex,
-                          onTap: () {
-                            setState(() {
-                              _selectedCategoryIndex = index;
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Produits populaires",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) =>
-                    ProductCard(product: filteredProducts[index]),
-                childCount: filteredProducts.length,
-              ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.65,
-              ),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+      bottomNavigationBar: BottomNavbar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+        },
       ),
     );
   }
 }
+

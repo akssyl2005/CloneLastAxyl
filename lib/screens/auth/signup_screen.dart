@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:complete_shop_clone/servises/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -13,35 +17,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  DateTime? selectedDate;
+  String selectedGender = '';
+  File? profileImage;
 
   bool isLoading = false;
   bool acceptTerms = false;
-  bool _passwordVisible = false;
-  bool _confirmPasswordVisible = false;
-
-  // Liste des domaines autorisés
-  final List<String> allowedDomains = [
-    'gmail.com',
-    'yahoo.com',
-    'outlook.com',
-    'icloud.com',
-    'protonmail.com',
-    'zoho.com',
-    'aol.com',
-    'yandex.com',
-    'mail.com',
-    'gmx.com',
-    'fastmail.com',
-    'tutanota.com',
-    'mail.ru',
-    'orange.fr',
-    'sfr.fr',
-    'free.fr',
-    'walla.com',
-    'o2online.de',
-    'twitch.com',
-    'discord.com',
-  ];
+  bool showPassword = false;
+  bool showConfirmPassword = false;
 
   void showToast(String message, {bool success = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -52,10 +35,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // Validation de l'email
-  bool isValidEmail(String email) {
-    final domain = email.split('@').last;
-    return allowedDomains.contains(domain);
+  Future<void> pickImage() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() => profileImage = File(picked.path));
+    }
+  }
+
+  Future<void> selectDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() => selectedDate = pickedDate);
+    }
   }
 
   Future<void> signUp() async {
@@ -67,15 +63,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (name.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
-        confirmPassword.isEmpty) {
-      showToast("All fields are required.");
+        confirmPassword.isEmpty ||
+        selectedDate == null ||
+        selectedGender.isEmpty) {
+      showToast("Please fill in all fields.");
       return;
     }
 
     if (!isValidEmail(email)) {
-      showToast(
-        "Please use a valid email address (e.g., gmail.com, yahoo.com).",
-      );
+      showToast("Invalid email address.");
       return;
     }
 
@@ -109,6 +105,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  Future<void> signUpWithGoogle() async {
+    setState(() => isLoading = true);
+
+    try {
+      final userCredential = await AuthService.signInWithGoogle();
+      if (userCredential == null) {
+        showToast("Google Sign-Up cancelled.");
+      } else {
+        showToast("Account created with Google!", success: true);
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (e) {
+      showToast("Google sign-up failed.");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[\w-\.]+@(gmail|yahoo|outlook|hotmail|icloud|protonmail|aol|live|msn|wanadoo|orange|free|laposte|sfr|gmx|yandex|mail)\.(com|fr|net|org|co\.uk|de|es|it|ca|ch|be|nl)$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +141,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Image.asset('assets/images/logo.jpeg', height: 100),
+                child: GestureDetector(
+                  onTap: pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage:
+                        profileImage != null ? FileImage(profileImage!) : null,
+                    child:
+                        profileImage == null
+                            ? const Icon(
+                              Icons.camera_alt,
+                              size: 40,
+                              color: Colors.black45,
+                            )
+                            : null,
+                  ),
+                ),
               ),
               const SizedBox(height: 30),
               const Text(
@@ -136,16 +173,65 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 16),
               _buildInputField("Email", emailController),
               const SizedBox(height: 16),
-              _buildPasswordField(
+              _buildInputField(
                 "Password",
                 passwordController,
-                _passwordVisible,
+                isPassword: true,
+                showPassword: showPassword,
+                togglePassword:
+                    () => setState(() => showPassword = !showPassword),
               ),
               const SizedBox(height: 16),
-              _buildPasswordField(
+              _buildInputField(
                 "Confirm Password",
                 confirmPasswordController,
-                _confirmPasswordVisible,
+                isPassword: true,
+                showPassword: showConfirmPassword,
+                togglePassword:
+                    () => setState(
+                      () => showConfirmPassword = !showConfirmPassword,
+                    ),
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: selectDate,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade400),
+                  ),
+                  child: Text(
+                    selectedDate == null
+                        ? "Select Date of Birth"
+                        : "Date of Birth: ${selectedDate!.toLocal().toString().split(' ')[0]}",
+                    style: const TextStyle(color: Colors.black54),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedGender.isEmpty ? null : selectedGender,
+                decoration: InputDecoration(
+                  labelText: "Gender",
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                items:
+                    ['Male', 'Female', 'Other'].map((gender) {
+                      return DropdownMenuItem(
+                        value: gender,
+                        child: Text(gender),
+                      );
+                    }).toList(),
+                onChanged: (value) => setState(() => selectedGender = value!),
               ),
               const SizedBox(height: 16),
               Row(
@@ -165,23 +251,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 20),
               isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: signUp,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  : Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: signUp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        "Sign Up",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: signUpWithGoogle,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.black87,
+                            side: const BorderSide(color: Colors.black),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                "assets/images/google.jfif",
+                                height: 24,
+                              ),
+                              const SizedBox(width: 10),
+                              const Text("Sign up with Google"),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
               const SizedBox(height: 24),
               Center(
@@ -203,15 +319,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // Fonction pour afficher un champ de texte avec un mot de passe
-  Widget _buildPasswordField(
+  Widget _buildInputField(
     String label,
-    TextEditingController controller,
-    bool isPasswordVisible,
-  ) {
+    TextEditingController controller, {
+    bool isPassword = false,
+    bool showPassword = false,
+    VoidCallback? togglePassword,
+  }) {
     return TextField(
       controller: controller,
-      obscureText: !isPasswordVisible,
+      obscureText: isPassword && !showPassword,
       style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: label,
@@ -223,40 +340,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           borderSide: BorderSide(color: Colors.grey.shade400),
           borderRadius: BorderRadius.circular(12),
         ),
-        suffixIcon: IconButton(
-          icon: Icon(
-            isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: Colors.black54,
-          ),
-          onPressed: () {
-            setState(() {
-              if (label == "Password") {
-                _passwordVisible = !_passwordVisible;
-              } else {
-                _confirmPasswordVisible = !_confirmPasswordVisible;
-              }
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  // Fonction pour afficher un champ de texte classique
-  Widget _buildInputField(String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Colors.black87),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.black54),
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade400),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        suffixIcon:
+            isPassword
+                ? IconButton(
+                  icon: Icon(
+                    showPassword ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.black54,
+                  ),
+                  onPressed: togglePassword,
+                )
+                : null,
       ),
     );
   }

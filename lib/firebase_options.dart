@@ -92,4 +92,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'e-commerce-app-d5951.firebasestorage.app',
     measurementId: 'G-D7JCLPEPER',
   );
+
 }
