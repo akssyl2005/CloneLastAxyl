@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:complete_shop_clone/servises/firestore_service.dart';
 import 'package:complete_shop_clone/models/product_model.dart';
 import 'package:complete_shop_clone/models/banner_model.dart';
@@ -81,60 +81,67 @@ class _HomeBodyState extends State<HomeBody> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: _categories.map((category) {
-                final isSelected = _selectedCategory == category.name;
-                return GestureDetector(
-                  onTap: () => _filterByCategory(category.name),
-                  child: Container(
-                    width: 70,
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor:
-                              isSelected ? Colors.black : Colors.grey[200],
-                          child: Icon(
-                            category.icon,
-                            size: 24,
-                            color: isSelected ? Colors.white : Colors.black87,
-                          ),
+              children:
+                  _categories.map((category) {
+                    final isSelected = _selectedCategory == category.name;
+                    return GestureDetector(
+                      onTap: () => _filterByCategory(category.name),
+                      child: Container(
+                        width: 70,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor:
+                                  isSelected ? Colors.black : Colors.grey[200],
+                              child: Icon(
+                                category.icon,
+                                size: 24,
+                                color:
+                                    isSelected ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              category.name,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight:
+                                    isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          category.name,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
+                      ),
+                    );
+                  }).toList(),
             ),
           ),
 
           const SizedBox(height: 24),
 
           // 🔹 Produits
-          SectionTitle(title: _selectedCategory == null ? "Top Selling" : _selectedCategory!),
+          SectionTitle(
+            title:
+                _selectedCategory == null ? "Top Selling" : _selectedCategory!,
+          ),
           const SizedBox(height: 12),
           _products.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : SizedBox(
-                  height: 260,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _products.length,
-                    itemBuilder: (_, i) => ProductCard(product: _products[i]),
-                  ),
+                height: 260,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _products.length,
+                  itemBuilder: (_, i) => ProductCard(product: _products[i]),
                 ),
+              ),
         ],
       ),
     );
   }
 }
-

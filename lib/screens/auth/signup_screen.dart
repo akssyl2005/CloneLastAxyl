@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:complete_shop_clone/servises/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -88,18 +90,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => isLoading = true);
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      // Création du compte utilisateur
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-      final user = FirebaseAuth.instance.currentUser;
-      print("User signed up: ${user?.email}");
+      final user = userCredential.user;
+      String? imageUrl;
+
+      // Upload de l’image si elle existe
+      if (profileImage != null) {
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_profiles')
+            .child('${user!.uid}.jpg');
+
+        await ref.putFile(profileImage!);
+        imageUrl = await ref.getDownloadURL();
+      }
+
+      // Sauvegarde des données dans Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'uid': user.uid,
+        'fullName': name,
+        'email': email,
+        'dateOfBirth': selectedDate!.toIso8601String(),
+        'gender': selectedGender,
+        'imageUrl': imageUrl,
+        'createdAt': Timestamp.now(),
+      });
 
       showToast("Account created successfully!", success: true);
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       showToast(e.message ?? "Signup failed.");
+    } catch (e) {
+      showToast("An error occurred.");
+      print(e);
     } finally {
       setState(() => isLoading = false);
     }
@@ -125,7 +151,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool isValidEmail(String email) {
     final emailRegex = RegExp(
-      r'^[\w-\.]+@(gmail|yahoo|outlook|hotmail|icloud|protonmail|aol|live|msn|wanadoo|orange|free|laposte|sfr|gmx|yandex|mail)\.(com|fr|net|org|co\.uk|de|es|it|ca|ch|be|nl)$',
+      r'^[\w-\.]+@(gmail|yahoo|outlook|hotmail|icloud|protonmail|aol|live|msn|wanadoo|orange|free|laposte|sfr|gmx|yandex|mail|se.univ-bejaia)\.(com|fr|net|org|co\.uk|de|es|it|ca|ch|be|nl|dz)$',
     );
     return emailRegex.hasMatch(email);
   }

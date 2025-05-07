@@ -3,7 +3,6 @@ import '../../../cart/theme.dart';
 import '../../../cart/cart_item.dart';
 import '../../../cart/TopBarCart.dart';
 
-
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
 
@@ -11,7 +10,8 @@ class CartScreen extends StatefulWidget {
   State<CartScreen> createState() => _CartScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateMixin {
+class _CartScreenState extends State<CartScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
@@ -22,21 +22,24 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
       name: 'Ensemble Survettement',
       price: 299.99,
       quantity: 1,
-      imageUrl: "https://static.zara.net/assets/public/1758/a8f0/20034b4f8e29/60022b834420/00761451800-p/00761451800-p.jpg",
+      imageUrl:
+          "https://static.zara.net/assets/public/1758/a8f0/20034b4f8e29/60022b834420/00761451800-p/00761451800-p.jpg",
     ),
     CartItem(
       id: '2',
       name: 'Baskets "Skate"',
       price: 129.50,
       quantity: 2,
-      imageUrl: "https://static.bershka.net/assets/public/a026/f81f/d9cd43b9bcc9/c06ea1c12c95/1245636120201-p1/1245636120201-p1.jpg",
+      imageUrl:
+          "https://static.bershka.net/assets/public/a026/f81f/d9cd43b9bcc9/c06ea1c12c95/1245636120201-p1/1245636120201-p1.jpg",
     ),
     CartItem(
       id: '3',
       name: 'Ensemble Leger',
       price: 79.95,
       quantity: 1,
-      imageUrl: "https://static.bershka.net/4/photos2/2024/I/0/1/b/6377/228/711/BS/BS/6377228711_2_24_0.jpg",
+      imageUrl:
+          "https://static.bershka.net/4/photos2/2024/I/0/1/b/6377/228/711/BS/BS/6377228711_2_24_0.jpg",
     ),
   ];
 
@@ -47,10 +50,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _controller.forward();
   }
 
@@ -62,7 +65,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
 
   void _updateQuantity(int index, int change) {
     setState(() {
-      _cartItems[index].quantity = (_cartItems[index].quantity + change).clamp(1, 10);
+      _cartItems[index].quantity = (_cartItems[index].quantity + change).clamp(
+        1,
+        10,
+      );
     });
   }
 
@@ -82,52 +88,53 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
     );
   }
 
-  double get _subtotal => _cartItems.fold(
-      0, (sum, item) => sum + (item.price * item.quantity));
+  double get _subtotal =>
+      _cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
 
   double get _tax => _subtotal * 0.08; // 8% tax
 
   double get _total => _subtotal + _tax;
 
   @override
- Widget build(BuildContext context) {
-  final theme = Theme.of(context);
-  final colorScheme = theme.colorScheme;
-  // Override theme with black and white
-  final blackWhiteScheme = theme.colorScheme.copyWith(
-    primary: Colors.black,
-    onPrimary: Colors.white,
-    secondary: Colors.white,
-    onSecondary: Colors.black,
-    surface: Colors.white,
-    onSurface: Colors.black,
-    background: Colors.white,
-    onBackground: Colors.black,
-  );
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    // Override theme with black and white
+    final blackWhiteScheme = theme.colorScheme.copyWith(
+      primary: Colors.black,
+      onPrimary: Colors.white,
+      secondary: Colors.white,
+      onSecondary: Colors.black,
+      surface: Colors.white,
+      onSurface: Colors.black,
+      background: Colors.white,
+      onBackground: Colors.black,
+    );
 
-  return Scaffold(
-    backgroundColor: blackWhiteScheme.background,
-    
-    // L'ancien appBar est commenté dans votre code
+    return Scaffold(
+      backgroundColor: blackWhiteScheme.background,
 
-    body: Column(
-      children: [
-        // Ajout de SafeArea pour éviter les problèmes avec la barre d'état
-        const SafeArea(child: TopBarCart()),
-        
-        // Contenu principal dans un Expanded pour prendre le reste de l'espace
-        Expanded(
-          child: _cartItems.isEmpty
-            ? _buildEmptyCart(blackWhiteScheme, theme)
-            : _buildCartContent(blackWhiteScheme, theme),
-        ),
-      ],
-    ),
-    bottomNavigationBar: _cartItems.isEmpty
-        ? null
-        : _buildCheckoutBar(blackWhiteScheme, theme),
-  );
-}
+      // L'ancien appBar est commenté dans votre code
+      body: Column(
+        children: [
+          // Ajout de SafeArea pour éviter les problèmes avec la barre d'état
+          const SafeArea(child: TopBarCart()),
+
+          // Contenu principal dans un Expanded pour prendre le reste de l'espace
+          Expanded(
+            child:
+                _cartItems.isEmpty
+                    ? _buildEmptyCart(blackWhiteScheme, theme)
+                    : _buildCartContent(blackWhiteScheme, theme),
+          ),
+        ],
+      ),
+      bottomNavigationBar:
+          _cartItems.isEmpty
+              ? null
+              : _buildCheckoutBar(blackWhiteScheme, theme),
+    );
+  }
 
   Widget _buildEmptyCart(ColorScheme colorScheme, ThemeData theme) {
     return FadeTransition(
@@ -165,7 +172,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -197,14 +207,16 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                   position: Tween<Offset>(
                     begin: const Offset(1, 0),
                     end: Offset.zero,
-                  ).animate(CurvedAnimation(
-                    parent: _controller,
-                    curve: Interval(
-                      0.2 + (index * 0.1).clamp(0.0, 0.8),
-                      0.8 + (index * 0.1).clamp(0.0, 0.2),
-                      curve: Curves.easeOutQuart,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: _controller,
+                      curve: Interval(
+                        0.2 + (index * 0.1).clamp(0.0, 0.8),
+                        0.8 + (index * 0.1).clamp(0.0, 0.2),
+                        curve: Curves.easeOutQuart,
+                      ),
                     ),
-                  )),
+                  ),
                   child: _buildCartItem(item, index, colorScheme, theme),
                 ),
               ),
@@ -215,7 +227,12 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildCartItem(CartItem item, int index, ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildCartItem(
+    CartItem item,
+    int index,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -246,7 +263,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                     width: 100,
                     height: 100,
                     color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey,
+                    ),
                   );
                 },
               ),
@@ -280,7 +300,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                       // Quantity controls
                       Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: colorScheme.primary, width: 1),
+                          border: Border.all(
+                            color: colorScheme.primary,
+                            width: 1,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -290,7 +313,10 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: item.quantity > 1 ? colorScheme.primary : Colors.grey.withOpacity(0.3),
+                                  color:
+                                      item.quantity > 1
+                                          ? colorScheme.primary
+                                          : Colors.grey.withOpacity(0.3),
                                   borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(7),
                                     bottomLeft: Radius.circular(7),
@@ -299,12 +325,17 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
                                 child: Icon(
                                   Icons.remove,
                                   size: 16,
-                                  color: item.quantity > 1 ? colorScheme.onPrimary : Colors.grey[700],
+                                  color:
+                                      item.quantity > 1
+                                          ? colorScheme.onPrimary
+                                          : Colors.grey[700],
                                 ),
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               child: Text(
                                 '${item.quantity}',
                                 style: theme.textTheme.bodyMedium?.copyWith(
