@@ -18,10 +18,17 @@ class TopBar extends StatelessWidget {
             onTap: () {
               Navigator.pushNamed(context, "/profile");
             },
-            child: const CircleAvatar(
-              backgroundImage: AssetImage("assets/images/avatar.png"),
-              radius: 20,
-            ),
+
+           child: const CircleAvatar(
+  radius: 20,
+  backgroundColor: Colors.white, // Vous pouvez personnaliser la couleur de fond
+  child: Icon(
+    Icons.person_outline,
+    color: Colors.black, // Couleur de l'icône
+    size: 24, // Taille de l'icône
+  ),
+),
+
           ),
         ],
       ),

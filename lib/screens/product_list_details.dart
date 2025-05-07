@@ -142,8 +142,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   },
                   icon: const Icon(Icons.add),
                 ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                   
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Ajouté au panier')),
+                    );
+                  },
+                  icon: const Icon(Icons.shopping_cart),
+                  label: const Text('Ajouter'),
+                ),
               ],
             ),
+
             const SizedBox(height: 16),
 
             // ✍️ Avis utilisateur

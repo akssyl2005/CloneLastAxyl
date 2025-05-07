@@ -66,6 +66,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             children: [
               const SizedBox(height: 60),
               // LOGO SUPPRIMÉ
+              
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),

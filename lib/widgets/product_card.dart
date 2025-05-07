@@ -33,20 +33,47 @@ class ProductCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
+       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 Image produit
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Image.network(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
+            // 🔹 Image produit avec icône de cœur superposée
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Image.network(
+                      product.imageUrl,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
+                // Icône de cœur en haut à droite
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Ajoutez ici la logique pour ajouter aux favoris
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${product.name} ajouté aux favoris')),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                     
+                      child: const Icon(
+                        Icons.favorite_border,
+                        color: Color.fromARGB(255, 189, 188, 188),
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
+
 
             // 🔹 Infos produit
             Padding(

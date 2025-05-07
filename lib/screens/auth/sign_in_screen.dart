@@ -146,7 +146,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
-                                "assets/images/google.jfif",
+                                "assets/images/google.png",
                                 height: 24,
                               ),
                               const SizedBox(width: 10),
