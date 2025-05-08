@@ -1,21 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:complete_shop_clone/models/product_model.dart';
 import 'package:complete_shop_clone/screens/product_list_details.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final Product product;
 
   const ProductCard({super.key, required this.product});
 
   @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFavorite();
+  }
+
+  Future<void> checkIfFavorite() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+    final wishlist = List<String>.from(userDoc.data()?['wishlist'] ?? []);
+    setState(() {
+      isFavorite = wishlist.contains(widget.product.id);
+    });
+  }
+
+  Future<void> toggleFavorite() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final userRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    if (isFavorite) {
+      await userRef.update({
+        'wishlist': FieldValue.arrayRemove([widget.product.id]),
+      });
+    } else {
+      await userRef.update({
+        'wishlist': FieldValue.arrayUnion([widget.product.id]),
+      });
+    }
+
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Aller à la page de détails
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ProductDetailPage(product: product),
+            builder: (_) => ProductDetailPage(product: widget.product),
           ),
         );
       },
@@ -33,56 +77,47 @@ class ProductCard extends StatelessWidget {
             ),
           ],
         ),
-       child: Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 Image produit avec icône de cœur superposée
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(18),
+                  ),
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Image.network(
-                      product.imageUrl,
+                      widget.product.imageUrl,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
-                // Icône de cœur en haut à droite
                 Positioned(
                   top: 8,
                   right: 8,
                   child: GestureDetector(
-                    onTap: () {
-                      // Ajoutez ici la logique pour ajouter aux favoris
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${product.name} ajouté aux favoris')),
-                      );
-                    },
+                    onTap: toggleFavorite,
                     child: Container(
                       padding: const EdgeInsets.all(5),
-                     
-                      child: const Icon(
-                        Icons.favorite_border,
-                        color: Color.fromARGB(255, 189, 188, 188),
-                        size: 18,
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                        size: 20,
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-
-
-            // 🔹 Infos produit
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.name,
+                    widget.product.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -92,19 +127,16 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    product.description,
+                    widget.product.description,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       Text(
-                        "${product.salePrice.toStringAsFixed(2)} €",
+                        "${widget.product.salePrice.toStringAsFixed(2)} €",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
@@ -112,9 +144,9 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      if (product.isOnSale)
+                      if (widget.product.isOnSale)
                         Text(
-                          "${product.price.toStringAsFixed(2)} €",
+                          "${widget.product.price.toStringAsFixed(2)} €",
                           style: const TextStyle(
                             decoration: TextDecoration.lineThrough,
                             fontSize: 12,
